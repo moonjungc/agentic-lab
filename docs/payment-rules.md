@@ -9,7 +9,9 @@
 ## 수수료 계산 원칙
 
 - 환불 수수료는 **요청 금액(`requestedAmount`)의 5%**.
+  - Why: PG사 카드 취소 수수료와 운영비를 커버하는 표준 요율이다.
 - `feeAmount = Math.floor(requestedAmount * 0.05)` — 소수점은 반올림 없이 내림(버림)하여 정수 minor unit으로 맞춘다.
+  - Why: 올림이나 반올림을 쓰면 특정 금액대에서 고객이 계산보다 더 많은 수수료를 떼이게 되어, 소비자에게 불리한 방향으로 반올림하지 않는다는 원칙상 항상 내림을 쓴다. (Gotcha: `1233 * 0.05 = 61.65`처럼 반올림이면 62가 되지만 정책상 61이 맞다 — `tests/refund.test.js` 참고)
 - 실환불액은 `refundedAmount = requestedAmount - feeAmount`.
 - 세 값(`requestedAmount`, `feeAmount`, `refundedAmount`) 모두 결과 객체에 포함한다. 로그에는 `logPayment()`의 스키마(단일 `amount_minor` 필드) 제약상 `feeAmount`, `refundedAmount`를 각각 별도 이벤트(`refund.fee_charged`, `refund.processed`)로 남긴다.
 
